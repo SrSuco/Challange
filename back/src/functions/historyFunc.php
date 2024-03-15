@@ -3,14 +3,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 header('Access-Control-Allow-Methods: GET, POST, SERVER, DELETEELEMENT');
 header("Access-Control-Allow-Origin: *");
 
-function select(){
-    $host = "pgsql_desafio";
-    $db = "applicationphp";
-    $user = "root";
-    $pw = "root";
-
-    $myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
+function select($myPDO){
     $sql = "SELECT * FROM orders ORDER BY code ASC ";
     $response = $myPDO -> query($sql);
     $dbData = [];
@@ -20,16 +13,12 @@ function select(){
     echo json_encode($dbData);
 };
 
-function selectOrders($code){
-    $host = "pgsql_desafio";
-    $db = "applicationphp";
-    $user = "root";
-    $pw = "root";
+function selectOrders($myPDO, $code){
+    $sql = "SELECT * FROM order_item WHERE order_code=:code ";
+    $response = $myPDO->prepare($sql);
+    $response->bindParam(':code', $code);
+    $response->execute();
 
-    $myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
-    $sql = "SELECT * FROM order_item WHERE order_code = '$code' ";
-    $response = $myPDO -> query($sql);
     $dbData = [];
     while($row = $response -> fetch(PDO::FETCH_ASSOC)){
         $dbData[] = $row;

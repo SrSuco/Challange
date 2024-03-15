@@ -3,16 +3,10 @@ header("Access-Control-Allow-Headers: Content-Type");
 header('Access-Control-Allow-Methods: GET, POST, SERVER, DELETEELEMENT');
 header("Access-Control-Allow-Origin: *");
 
-function select(){
-	$host = "pgsql_desafio";
-	$db = "applicationphp";
-	$user = "root";
-	$pw = "root";
-
-	$myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
+function select($myPDO){
 	$sql = "SELECT * FROM order_item ORDER BY code ASC ";
-	$response = $myPDO -> query($sql);
+	$response = $myPDO -> prepare($sql);
+	$response->execute();
 	$dbData = [];
 	while($row = $response -> fetch(PDO::FETCH_ASSOC)){
 		$dbData[] = $row;
@@ -20,16 +14,10 @@ function select(){
 	echo json_encode($dbData);
 };
 
-function selectTemporary(){
-	$host = "pgsql_desafio";
-	$db = "applicationphp";
-	$user = "root";
-	$pw = "root";
-
-	$myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
+function selectTemporary($myPDO){
 	$sql = "SELECT * FROM cart ORDER BY code ASC ";
-	$response = $myPDO -> query($sql);
+	$response = $myPDO -> prepare($sql);
+	$response->execute();
 	$dbData = [];
 	while($row = $response -> fetch(PDO::FETCH_ASSOC)){
 		$dbData[] = $row;
@@ -37,19 +25,15 @@ function selectTemporary(){
 	echo json_encode($dbData);
 };
 
-function insert($taxesTotal, $priceTotal){
-	$host = "pgsql_desafio";
-	$db = "applicationphp";
-	$user = "root";
-	$pw = "root";
-	
-	$myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
-	$insert = $myPDO->prepare("INSERT INTO  orders(total, tax) VALUES ('$taxesTotal', '$priceTotal')");
+function insert($myPDO, $taxesTotal, $priceTotal){
+	$insert = $myPDO->prepare("INSERT INTO  orders(total, tax) VALUES (:total, :tax)");
+	$insert->bindParam(':total', $priceTotal);
+    $insert->bindParam(':tax', $taxesTotal);
 	$insert->execute();
 
     $sql = "SELECT code FROM orders ORDER BY code DESC LIMIT 1";
-    $response = $myPDO -> query($sql);
+    $response = $myPDO -> prepare($sql);
+	$response->execute();
     $row = $response->fetch(PDO::FETCH_ASSOC);
     $code = $row['code'];
 
@@ -58,27 +42,17 @@ function insert($taxesTotal, $priceTotal){
 	echo json_encode($purchaseInfo);
 };
 
-function insertCart($amount, $totalTaxes, $totalwTaxes, $productCode){
-	$host = "pgsql_desafio";
-	$db = "applicationphp";
-	$user = "root";
-	$pw = "root";
-	
-	$myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
-	$insert = $myPDO->prepare("INSERT INTO cart (product_code, amount, price, tax) VALUES ('$productCode', $amount, $totalwTaxes, $totalTaxes)");
+function insertCart($myPDO, $amount, $totalTaxes, $totalwTaxes, $productCode){
+	$insert = $myPDO->prepare("INSERT INTO cart (product_code, amount, price, tax) VALUES (:productCode, :amount, :totalwTaxes, :totalTaxes)");
+	$insert->bindParam(':productCode', $productCode);
+	$insert->bindParam(':amount', $amount);
+    $insert->bindParam(':totalwTaxes', $totalwTaxes);
+    $insert->bindParam(':totalTaxes', $totalTaxes);
 	$insert->execute();
 	echo json_encode($insert);
 };
 
-function deleteElement(){
-	$host = "pgsql_desafio";
-	$db = "applicationphp";
-	$user = "root";
-	$pw = "root";
-	
-	$myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
-
+function deleteElement($myPDO){
 	$deleteElement = $myPDO->prepare("DELETE FROM cart");
 	$deleteElement->execute();
 	echo json_encode($deleteElement);

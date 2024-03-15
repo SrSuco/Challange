@@ -7,11 +7,17 @@ header("Access-Control-Allow-Origin: *");
 include '../functions/historyFunc.php';
 
 function requestMethodManager(){
+    $host = "pgsql_desafio";
+    $db = "applicationphp";
+    $user = "root";
+    $pw = "root";
+
+    $myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
     $method = $_SERVER['REQUEST_METHOD'];
     switch ($method){
         case 'GET':
             $code = $_GET['code'];
-            return selectOrders($code);
+            return selectOrders($myPDO, $code);
             break;
     }
 };

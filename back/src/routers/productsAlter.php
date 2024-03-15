@@ -7,6 +7,13 @@ header("Access-Control-Allow-Origin: *");
 include '../functions/productsFunc.php';
 
 function requestMethodManager(){
+    $host = "pgsql_desafio";
+    $db = "applicationphp";
+    $user = "root";
+    $pw = "root";
+
+    $myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
+
     $method = $_SERVER['REQUEST_METHOD'];
     switch ($method){
             case 'POST':
@@ -14,7 +21,7 @@ function requestMethodManager(){
                 error_log(print_r($dataReceived, true));
                 $code = $dataReceived['id'];
                 $amount = $dataReceived['value'];
-                return update($code, $amount);
+                return update($myPDO, $code, $amount);
                 break;
     }
 };

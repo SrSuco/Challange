@@ -7,10 +7,17 @@ header("Access-Control-Allow-Origin: *");
 include '../functions/homeFunc.php';
 
 function requestMethodManager(){
+    $host = "pgsql_desafio";
+    $db = "applicationphp";
+    $user = "root";
+    $pw = "root";
+
+    $myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
+    
     $method = $_SERVER['REQUEST_METHOD'];
     switch ($method){
         case 'GET':
-            return selectTemporary();
+            return selectTemporary($myPDO);
             break;
         case 'POST':
             $dataReceived = json_decode(file_get_contents('php://input'), true);
@@ -19,10 +26,10 @@ function requestMethodManager(){
             $totalTaxes = $dataReceived['totalTaxes'];
             $totalwTaxes = $dataReceived['totalwTaxes'];
             $productCode = $dataReceived['productCode'];
-            return insertCart($amount, $totalTaxes, $totalwTaxes, $productCode);
+            return insertCart($myPDO, $amount, $totalTaxes, $totalwTaxes, $productCode);
             break;
         case 'DELETEELEMENT':
-            return deleteElement();
+            return deleteElement($myPDO);
             break;
     }
 };

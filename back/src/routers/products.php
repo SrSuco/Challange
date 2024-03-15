@@ -7,21 +7,28 @@ header("Access-Control-Allow-Origin: *");
 include '../functions/productsFunc.php';
 
 function requestMethodManager(){
+    $host = "pgsql_desafio";
+    $db = "applicationphp";
+    $user = "root";
+    $pw = "root";
+
+    $myPDO = new PDO("pgsql:host=$host;dbname=$db", $user, $pw);
+
     $method = $_SERVER['REQUEST_METHOD'];
     switch ($method){
         case 'GET':
-            return select();
+            return select($myPDO);
             break;
         case 'POST':
             $productName = htmlspecialchars($_POST['ProductName']);
             $amount = $_POST['Amount'];
             $unitPrice = $_POST['UnitPrice'];
             $categoryName = htmlspecialchars($_POST['categorySelect']);
-            return insert($productName, $amount, $unitPrice, $categoryName);
+            return insert($myPDO, $productName, $amount, $unitPrice, $categoryName);
             break;
         case 'DELETEELEMENT':
             $code = $_GET['code'];
-            return deleteElement($code);
+            return deleteElement($myPDO,$code);
             break;
     }
 };
